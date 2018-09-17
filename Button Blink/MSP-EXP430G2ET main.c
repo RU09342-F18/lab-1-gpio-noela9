@@ -48,9 +48,7 @@
 //  Texas Instruments, Inc
 //  May 2018
 //  Built with CCS Version 8.0 and IAR Embedded Workbench Version: 7.11
-//*****************************************************************************
-
-//  Anwar Noel
+//******************************************************************************
 
 #include <msp430.h>
 
@@ -59,11 +57,11 @@ int main(void)
     volatile unsigned int i;
     WDTCTL = WDTPW + WDTHOLD;                 // Stop watchdog timer
     P1DIR |= 0x01;                            // Set P1.0 to output direction
-
+    
     while(1)
     {
+        if ((P1IN & BIT3)!= BIT3)
         P1OUT ^= 0x01;                        // Toggle P1.0 using exclusive-OR
-
-        for (i=5000; i>0; i--);
+        for (i=10000; i>0; i--);
   }
 }
