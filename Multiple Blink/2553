@@ -1,5 +1,5 @@
 /* --COPYRIGHT--,BSD_EX
- * Copyright (c) 2013, Texas Instruments Incorporated
+ * Copyright (c) 2018, Texas Instruments Incorporated
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,58 +29,41 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- *******************************************************************************
- *
- *                       MSP432 CODE EXAMPLE DISCLAIMER
- *
- * MSP432 code examples are self-contained low-level programs that typically
- * demonstrate a single peripheral function or device feature in a highly
- * concise manner. For this the code may rely on the device's power-on default
- * register values and settings such as the clock configuration and care must
- * be taken when combining code from several examples to avoid potential side
- * effects. Also see http://www.ti.com/tool/mspdriverlib for an API functional
- * library & https://dev.ti.com/pinmux/ for a GUI approach to peripheral configuration.
- *
  * --/COPYRIGHT--*/
 //******************************************************************************
-//   MSP432P401 Demo - Software Toggle P1.0
+//  MSP430G2xx3 Demo - Software Toggle P1.0
 //
-//   Description: Toggle P1.0 by xor'ing P1.0 inside of a software loop.
-//   ACLK = 32.768kHz, MCLK = SMCLK = default DCO~1MHz
+//  Description; Toggle P1.0 by xor'ing P1.0 inside of a software loop.
+//  ACLK = n/a, MCLK = SMCLK = default DCO
 //
-//                MSP432P401x
+//                MSP430G2xx3
 //             -----------------
-//         /|\|                 |
+//         /|\|              XIN|-
 //          | |                 |
-//          --|RST              |
+//          --|RST          XOUT|-
 //            |                 |
 //            |             P1.0|-->LED
 //
-//   William Goh
-//   Texas Instruments Inc.
-//   June 2016 (updated) | November 2013 (created)
-//   Built with CCSv6.1, IAR, Keil, GCC
+//  E. Chen
+//  Texas Instruments, Inc
+//  May 2018
+//  Built with CCS Version 8.0 and IAR Embedded Workbench Version: 7.11
 //******************************************************************************
-#include "ti/devices/msp432p4xx/inc/msp.h"
-#include <stdint.h>
+
 #include <msp430.h>
 
 int main(void)
 {
-	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
-	P1SEL &= ~(BIT0 + BIT6);    //select LED
-	P1SEL2 &= ~(BIT0 + BIT6);   //select other LED
-	P1DIR |= (BIT0 + BIT6);     //set P1.0 and 1.6 to output
+    volatile unsigned int i;
+    WDTCTL = WDTPW + WDTHOLD;                 // Stop watchdog timer
+    P1DIR |= (BIT0 | BIT6);                            // Set P1.0 and P1.6 to output direction
 
-	P1OUT |= BIT0;              //set LED on
-	P1OUT &= ~BIT6;             //set other LED off
-	
-	while (1) {
-	    unsigned int i;      //counters for delays
+    while(1)
+    {
+        P1OUT ^= 0x01;                        // Toggle P1.0 using exclusive-OR
+        __delay_cycles(100000);
+        P1OUT ^= BIT6;
+        __delay_cycles(1000000);
 
-	        P1OUT ^= BIT0;       //toggle LED
-	        P1OUT ^= BIT6;      //toggle LED
-	        for (i=10000; i>0; i--);
-	}
-	return 0;
+  }
 }
